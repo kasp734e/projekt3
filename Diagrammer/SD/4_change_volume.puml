@@ -1,0 +1,49 @@
+@startuml PRJ3_SD_UC4
+
+mainframe **sd** UC4 Change Volume
+hide footbox
+
+actor User as u
+participant ":UI Buttons" as b
+participant ":Client1 RPi" as Client
+participant ":Sound Control" as sc
+
+alt Volume up
+    u ->> b : Press "Volume up"
+    b++
+
+    b ->> Client : Volume up pressed
+    b--
+    Client++
+
+    alt Volume is not at its highest
+        Client ->> sc : Turn volume up
+        Client--
+        sc++
+        sc -[#white]> Client :
+        sc--
+    else Exception 4.1: Volume is at maximum
+        note over of Client : Nothing happens
+    end
+
+else Volume down
+    u ->> b : Press "Volume down"
+    b++
+
+    b ->> Client : Volume down pressed
+    b--
+    Client++
+
+    alt Volume is not at its lowest
+        Client ->> sc : Turn volume down
+        Client--
+        sc++
+        sc -[#white]> Client :
+        sc--
+    else Exception 4.1: Volume is at minimum
+        note over of Client : Nothing happens
+    end
+end
+
+
+@enduml

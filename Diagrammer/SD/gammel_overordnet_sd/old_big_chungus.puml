@@ -1,0 +1,170 @@
+
+@startuml sd-bigchungus
+mainframe **sd** Music-Light System
+
+actor User
+participant "Button Input" as GPIO
+participant "Client RPi" as Client
+participant "Server RPi" as Server
+participant "Sound Control" as Sound
+participant "Speaker" as Speaker
+participant "LED Matrix" as LED
+
+
+User ->> GPIO : Press "Play/Pause"
+activate GPIO
+GPIO ->> Client : "Play/Pause" pressed
+deactivate GPIO
+
+activate Client
+
+loop For each song in playlist
+    par Audio Output
+        Client ->> Sound : Play song
+        activate Sound
+        Sound ->> Speaker : Play song
+        deactivate Sound
+    else Visualizer
+        Client ->> LED : Start LED
+    end
+
+    alt Song is playing
+opt Volume Up
+        User ->> GPIO : Press "Volume +"
+        activate GPIO
+        GPIO ->> Client : "Volume +" pressed
+        deactivate GPIO
+        Client ->> Sound : Volume up
+        activate Sound
+        Sound ->> Speaker : Volume up
+        deactivate Sound
+    end
+
+    opt Volume Down
+        User ->> GPIO : Press "Volume -"
+        activate GPIO
+        GPIO ->> Client : "Volume -" pressed
+        deactivate GPIO
+        Client ->> Sound : Volume down
+        activate Sound
+        Sound ->> Speaker : Volume down
+        deactivate Sound
+    end
+
+    opt Pause song
+        User ->> GPIO : Press "Play/Pause"
+        activate GPIO
+        GPIO ->> Client : "Play/Pause" pressed
+        deactivate GPIO
+        Client ->> Sound : Pause song
+        activate Sound
+        Sound ->> Speaker : Pause song
+        deactivate Sound
+        Client ->> LED : Pause LED
+    end
+    opt Skip song
+        User ->> GPIO : Press "Skip"
+        activate GPIO
+        GPIO ->> Client : "Skip" pressed
+        deactivate GPIO
+        Client -> Server : Request next song
+        activate Server
+        Server --> Client : Send next song
+        deactivate Server
+    end
+    opt Rewind song
+        User ->> GPIO : Press "Rewind"
+        activate GPIO
+        GPIO ->> Client : "Rewind" pressed
+        deactivate GPIO
+        Client -> Server : Request previous song
+        activate Server
+        Server --> Client : Send previous song
+        deactivate Server
+    end
+    opt Shuffle
+        User ->> GPIO : Press "Shuffle"
+        activate GPIO
+        GPIO ->> Client : "Shuffle" pressed
+        deactivate GPIO
+        Client ->> Server : Shuffle playlist
+        activate Server
+        Server -> Server : Shuffle playlist
+        deactivate Server
+    end
+    else Song is paused
+opt Volume Up
+        User ->> GPIO : Press "Volume +"
+        activate GPIO
+        GPIO ->> Client : "Volume +" pressed
+        deactivate GPIO
+        Client ->> Sound : Volume up
+        activate Sound
+        Sound ->> Speaker : Volume up
+        deactivate Sound
+    end
+
+    opt Volume Down
+        User ->> GPIO : Press "Volume -"
+        activate GPIO
+        GPIO ->> Client : "Volume -" pressed
+        deactivate GPIO
+        Client ->> Sound : Volume down
+        activate Sound
+        Sound ->> Speaker : Volume down
+        deactivate Sound
+    end
+
+    opt Play song
+        User ->> GPIO : Press "Play/Pause"
+        activate GPIO
+        GPIO ->> Client : "Play/Pause" pressed
+        deactivate GPIO
+        Client ->> Sound : Play song
+        activate Sound
+        Sound ->> Speaker : Play song
+        deactivate Sound
+        Client ->> LED : Start LED
+    end
+    opt Skip song
+        User ->> GPIO : Press "Skip"
+        activate GPIO
+        GPIO ->> Client : "Skip" pressed
+        deactivate GPIO
+        Client -> Server : Request next song
+        activate Server
+        Server --> Client : Send next song
+        deactivate Server
+    end
+    opt Rewind song
+        User ->> GPIO : Press "Rewind"
+        activate GPIO
+        GPIO ->> Client : "Rewind" pressed
+        deactivate GPIO
+        Client -> Server : Request previous song
+        activate Server
+        Server --> Client : Send previous song
+        deactivate Server
+    end
+    opt Shuffle
+        User ->> GPIO : Press "Shuffle"
+        activate GPIO
+        GPIO ->> Client : "Shuffle" pressed
+        deactivate GPIO
+        Client ->> Server : Shuffle playlist
+        activate Server
+        Server -> Server : Shuffle playlist
+        deactivate Server
+    end
+    else Song is done
+     Client -> Server : Request next song
+    activate Server
+    Server --> Client : Send next song
+    deactivate Server
+
+    Client -> Client : Perform DSP on audio
+end
+end
+deactivate Client
+
+@enduml

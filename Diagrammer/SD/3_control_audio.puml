@@ -1,0 +1,84 @@
+@startuml PRJ3_SD_UC3
+hide footbox
+
+mainframe **sd** UC3 Control Audio
+
+actor User
+participant ":UI buttons" as GPIO
+participant ":Client1 RPi" as Client
+participant ":Server RPi" as Server
+participant ":Client2 RPi" as Client2
+participant ":Sound Control" as s_control
+participant ":Speaker" as Speaker
+participant ":LED Matrix" as LED
+
+' --- Initial Play ---
+User ->> GPIO : Press "Play/Pause"
+activate GPIO
+
+GPIO ->> Client : Play
+deactivate GPIO
+activate Client
+
+alt Music not already playing
+    Client -> s_control : Play current song 
+    activate s_control
+    s_control ->> Speaker : Play current song 
+    activate Speaker
+    deactivate Speaker
+    s_control --> Client : Ok
+    deactivate s_control
+    deactivate Speaker
+
+    Client -> LED : Start visualization
+    activate LED
+    LED -->> Client : Ok
+    deactivate LED
+else Exception 3.1: Music already playing
+    Client -> s_control : Pause music
+    activate s_control
+    s_control ->> Speaker : Pause music
+    activate Speaker
+    deactivate Speaker
+    s_control -->> Client : Ok
+    deactivate s_control
+
+    Client -> LED : Pause visualization
+    activate LED
+    LED -->> Client : Ok
+    deactivate LED
+else Exception 3.2: No song in queue
+    Client ->> Server : Write error: \nNo song queued
+    Server++
+    Server ->> Client2 : Write error: \nNo song queued
+    Client2++
+    Server--
+    Client2--
+    note over of Client : UC ends
+end
+
+note over of Client : Song ends
+Client -> s_control : Play next song
+activate s_control
+s_control ->> Speaker : Play next song
+activate Speaker
+deactivate Speaker
+s_control -->> Client : Ok
+deactivate s_control
+deactivate Speaker
+Client -> Server : Get new next song
+Server++
+Server -->> Client : New next song
+Server--
+Client ->> Client : Perform DSP on new audio
+Client ->> Client : Update song order on client
+
+note over of Client : See "UC3 ALT Button pressed"
+
+note over of Client : Playlist ends
+Client ->> Client : Restart playlist
+
+Client -[#white]-> Client
+deactivate Client
+
+@enduml

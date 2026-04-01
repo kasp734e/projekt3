@@ -1,0 +1,27 @@
+@startuml useCase
+
+mainframe Use-Case Diagram
+
+left to right direction
+
+actor Admin as a
+actor Bruger as b
+
+rectangle "Lyd-/Lyssystem" as s {
+    usecase "1: Power On" as pow
+    usecase "2: Edit Playlist" as edit
+    usecase "3: Control Audio" as con
+    usecase "4: Change Volume" as vol
+    usecase "5: Shuffle" as shuf
+}
+
+' Admin
+a --> pow
+a --> edit
+
+' Bruger
+b --> con
+b --> vol
+b --> shuf
+
+@enduml

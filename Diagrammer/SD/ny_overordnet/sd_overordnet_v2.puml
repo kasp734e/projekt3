@@ -1,0 +1,51 @@
+@startuml sd-systemDiagram
+mainframe **sd** Music-Light System
+
+actor User
+participant "UI" as GPIO
+participant "RPI Client" as Client
+participant "RPI Server" as Server
+participant "DAC" as Sound
+participant "Speaker" as Speaker
+participant "LED Matrix" as LED
+
+User ->> GPIO : Press "Play/Pause"
+activate GPIO
+GPIO ->> Client : "Play/Pause" pressed
+deactivate GPIO
+
+activate Client
+
+loop For each song in playlist
+    Client -> Server : Request song
+    activate Server
+    Server --> Client : Send song
+    deactivate Server
+
+    Client -> Client : Perform DSP on audio
+    
+    par Audio Output
+        Client ->> Sound : Play song
+        activate Sound
+        Sound ->> Speaker : Play song
+        deactivate Sound
+    else Visualizer
+        Client ->> LED : Start music visualisation
+    end
+
+    opt User presses button
+        note right of Client
+            Refer "[alt] Button pressed" sequence diagram
+        end note
+    end
+
+    note right of Client 
+        Song ends
+    end note
+end
+
+deactivate Client
+
+hide footbox
+
+@enduml

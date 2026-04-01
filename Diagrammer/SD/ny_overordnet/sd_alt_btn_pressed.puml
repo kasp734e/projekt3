@@ -1,0 +1,110 @@
+@startuml sd-button_pressed
+mainframe **sd** Music-Light System: [alt] Button pressed
+
+actor User
+participant "UI" as GPIO
+participant "RPI Client" as Client
+participant "RPI Server" as Server
+participant "DAC" as Sound
+participant "Speaker" as Speaker
+participant "LED Matrix" as LED
+
+alt Volume Up
+    User ->> GPIO : Press "Volume +"
+    activate GPIO
+    GPIO ->> Client : "Volume +" pressed
+    deactivate GPIO
+    Client++
+    Client ->> Sound : Volume up
+    Client--
+    activate Sound
+    Sound ->> Speaker : Volume up
+    deactivate Sound
+else Volume Down
+    User ->> GPIO : Press "Volume -"
+    activate GPIO
+    GPIO ->> Client : "Volume -" pressed
+    deactivate GPIO
+    Client++
+    Client ->> Sound : Volume down
+    Client--
+    activate Sound
+    Sound ->> Speaker : Volume down
+    deactivate Sound
+else Play/Pause song
+    User ->> GPIO : Press "Play/Pause"
+    activate GPIO
+    GPIO ->> Client : "Play/Pause" pressed
+    deactivate GPIO
+    alt Music already playing
+        Client++
+        Client ->> Sound : Pause song
+        activate Sound
+        Sound ->> Speaker : Pause song
+        deactivate Sound
+        Client ->> LED : Pause LED
+    else Music not playing
+        Client ->> Sound : Play song
+        activate Sound
+        Sound ->> Speaker : Play song
+        deactivate Sound
+        Client ->> LED : Play LED
+        Client--
+    end
+else Skip song
+    User ->> GPIO : Press "Skip"
+    activate GPIO
+    GPIO ->> Client : "Skip" pressed
+    deactivate GPIO
+    Client++
+
+    Client ->> Sound : Play next song
+    activate Sound
+    Sound ->> Speaker : Play song
+    deactivate Sound
+    Client ->> LED : Start music visualisation
+
+    Client -> Server : Request new next song
+    activate Server
+    Server -->> Client : New next song
+    deactivate Server
+    Client--
+
+else Rewind song
+    User ->> GPIO : Press "Rewind"
+    activate GPIO
+    GPIO ->> Client : "Rewind" pressed
+    deactivate GPIO
+    Client++
+
+    Client ->> Sound : Play previous song
+    activate Sound
+    Sound ->> Speaker : Play song
+    deactivate Sound
+    Client ->> LED : Start music visualisation
+
+    Client -> Server : Request old previous song
+    activate Server
+    Server -->> Client : Old previous song
+    deactivate Server
+    Client--
+
+else Shuffle
+    User ->> GPIO : Press "Shuffle"
+    activate GPIO
+    GPIO ->> Client : "Shuffle" pressed
+    deactivate GPIO
+    Client++
+    Client -> Server : Shuffle playlist
+    activate Server
+    Server -> Server : Shuffle playlist
+    Server -->> Client : New shuffled songs
+    deactivate Server
+    Client--
+end
+
+deactivate Client
+
+hide footbox
+
+@enduml

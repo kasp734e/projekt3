@@ -1,0 +1,78 @@
+@startuml sd_uc3_client
+hide footbox
+mainframe **sd** UC3 Control Audio, client
+
+actor User
+participant "<<boundary>> \n :ButtonWorker" as btn
+participant "<<controller>> \n :RPI Client" as client
+participant "<<boundary>> \n :ServerComs" as server
+participant "<<boundary>> \n :LightWorker" as lightDriver
+participant "<<boundary>> \n :AudioWorker" as soundDriver
+
+'loop Until User presses button
+'    client -> btn : checkInput()
+'    client++
+'    btn++
+'    btn -->> client : false
+'    client--
+'    btn--
+'end
+
+User++
+User ->> btn : Press "Play/Pause"
+User--
+btn++
+client -> btn : readMusicButtons()
+client++
+btn -->> client : PLAYPAUSE
+btn--
+
+alt isPaused == false
+    client ->> soundDriver : sound_start(sound)
+    soundDriver++
+    soundDriver--
+
+    client ->> lightDriver : setLines(bandPercentages)
+    lightDriver++
+    lightDriver--
+
+else Exception 3.1: Already playing \nisPaused == true
+    client ->> soundDriver : pause()
+    soundDriver++
+    soundDriver--
+
+    note over of lightDriver : exits visualisation loop
+    note over of client : UC ends 
+else Exception 3.2: No song in queue
+    client ->> server : print(error_msg)
+    server++
+    server--
+    note over of client : UC ends 
+end
+
+note over of client : Song ends
+loop 
+
+    client ->> soundDriver : sound_start(sound)
+    soundDriver++
+    soundDriver--
+
+    client ->> lightDriver : setLines(bandPercentages)
+    lightDriver++
+    lightDriver--
+
+    client -> server : getNextSong()
+    server++
+    server -->> client : 
+    server--
+
+    client ->> lightDriver : getAudioFromPath(currentPath)
+    lightDriver++
+    lightDriver ->> lightDriver : calculateFFT()
+    lightDriver--
+
+    note over of client : See **sd** UC3 Control Audio, client [Alternatives]
+    note over of client : Song ends
+end
+
+@enduml

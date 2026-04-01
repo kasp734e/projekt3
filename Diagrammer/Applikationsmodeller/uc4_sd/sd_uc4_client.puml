@@ -1,0 +1,35 @@
+@startuml sd_uc4_client
+hide footbox
+mainframe **sd** UC4 Change Volume, client
+
+actor User
+participant "<<boundary>> \n :ButtonWorker" as btn
+participant "<<controller>> \n :RPI Client" as client
+participant "<<boundary>> \n :AudioWorker" as soundDriver
+
+alt Volume up
+    User ->> btn : Presses "Volume up"
+    btn++
+    client -> btn : readMusicButtons()
+    client++
+    btn -->> client : VOLUMEUP
+    btn--
+    client ->> soundDriver : set_volume(volume)
+    client--
+    soundDriver++
+    soundDriver -[#white]-> client :
+    soundDriver--
+else Volume down
+    User ->> btn : Presses "Volume down"
+    btn++
+    client -> btn : readMusicButtons()
+    client++
+    btn -->> client : VOLUMEDOWN
+    btn--
+    client ->> soundDriver : set_volume(volume)
+    client--
+    soundDriver++
+    soundDriver -[#white]-> client :
+    soundDriver--
+end
+@enduml

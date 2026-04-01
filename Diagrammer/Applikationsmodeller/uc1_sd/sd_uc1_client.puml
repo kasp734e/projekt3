@@ -1,0 +1,44 @@
+@startuml sd_uc1_client
+
+hide footbox
+mainframe **sd** UC1 Power On, client
+
+actor Admin
+participant "<<boundary>> \n :UI_led" as led
+participant "<<controller>> \n :RPI Client" as client
+participant "<<boundary>> \n :ServerComs" as server
+
+Admin ->> client : Power on
+client++
+client ->> led : led1_blink()
+led++
+led--
+
+alt Server connected
+    
+    client -> server : getNextSong()
+    server++
+    server -->> client : 
+    server--
+
+    client -> server : getCurrentSong()
+    server++
+    server -->> client : 
+    server--
+
+    client -> server : getPreviousSong()
+    server++
+    server -->> client : 
+    server--
+
+    client ->> led : led1_on()
+    led++
+    led--
+
+else Exception 1.1: No connection to server (CURL timeout)
+    client ->> led : led1_Off()
+    led++
+    led--
+end
+
+@enduml

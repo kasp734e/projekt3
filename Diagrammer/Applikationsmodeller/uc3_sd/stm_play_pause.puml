@@ -1,0 +1,18 @@
+@startuml stm_uc3_client
+
+mainframe **stm** Music-Light System, RPI Client
+
+
+state Play{
+    Play : entry/Start music and light show
+}
+
+state Pause{
+    Pause : entry/Music and light show do not play
+}
+
+[*] --> Pause 
+Play --> Pause : Play/pause button pressed
+Pause --> Play : Play/pause button pressed
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml PRJ3_SD_UC3
+
+hide footbox
+mainframe **sd** UC1 Power On
+    actor Admin
+    participant ":Client1 RPi" as client
+    participant ":UI LED1" as UILED
+    participant ":Server RPi" as server
+    ' participant "Client2 Laptop" as client2
+    ' participant ":Sound Control" as s_control
+    ' participant ":Speaker" as speaker
+    ' participant ":LED Matrix" as LED
+
+Admin ->> server : Turn on
+server ++
+server--
+
+Admin ->> client : Turn on
+activate client
+
+client ->> UILED : start blinking
+activate UILED
+deactivate UILED
+
+client -> server : connect
+server++
+
+    alt Server connected
+        server -->> client : connected
+        server--
+        client ->> UILED : constantly on
+        activate UILED
+        deactivate UILED
+        
+        client -> server : get first, second and last song in playlist
+        server++
+        server -->> client : return
+        server--
+        client ->> client : set first song to current song \nset second song to next song \nset last song to last song 
+    else No connection to server 
+        server -[#white]> client :
+        server++
+        server -->> client : unsuccesfull
+        deactivate server
+        client ->> UILED : turn off
+        activate UILED
+        deactivate UILED
+        deactivate client
+    end    
+
+@enduml

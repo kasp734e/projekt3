@@ -1,0 +1,20 @@
+@startuml sd_uc2_serverFiles
+hide footbox
+mainframe **sd** UC2 Edit playlist, serverFiles
+
+actor Admin
+participant ":RPI Server" as serverFiles
+
+Admin ->> serverFiles : Open music folder
+alt Playlist not empty
+    alt Add song
+        Admin ->> serverFiles : Add song
+    else Remove song
+        Admin ->> serverFiles : Remove song
+    end
+    Admin ->> serverFiles : Change order
+else Exception 2.1: Playlist empty
+    Admin ->> serverFiles : Add song
+end
+
+@enduml

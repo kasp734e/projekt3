@@ -1,0 +1,16 @@
+@startuml stm_uc5_server
+
+mainframe **stm** Music-Light System, RPI Server
+
+state Shuffled{
+    Shuffled : entry/ Shuffle playlist and update RPI Client
+}
+state Sorted{
+    Sorted : entry/ Sort playlist and update RPI Client
+}
+
+[*] --> Sorted
+Sorted --> Shuffled : Shuffle button pressed
+Shuffled --> Sorted : Shuffle button pressed
+
+@enduml

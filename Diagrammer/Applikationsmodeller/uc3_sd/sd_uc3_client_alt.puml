@@ -1,0 +1,71 @@
+@startuml sd_uc3_client_alt
+hide footbox
+mainframe **sd** UC3 Control Audio, client [ALT: User presses button]
+
+actor User
+participant "<<boundary>> \n :ButtonWorker" as btn
+participant "<<controller>> \n :RPI Client" as client
+participant "<<boundary>> \n :ServerComs" as server
+participant "<<boundary>> \n :LightWorker" as lightDriver
+participant "<<boundary>> \n :AudioWorker" as soundDriver
+
+    client -> btn : readMusicButtons()
+    client++
+    btn++
+    alt Exception 3.4: Skip
+        User ->> btn : Press "Skip"
+        btn -->> client : SKIPSONG
+        btn--
+
+        client ->> soundDriver : sound_start(sound)
+        soundDriver++
+        soundDriver--
+
+        client ->> lightDriver : setLines(bandPercentages)
+        lightDriver++
+        lightDriver--
+
+        client -> server : getNextSong()
+        server++
+        server -->> client : 
+        server--
+        client ->> lightDriver : getAudioFromPath(currentPath)
+        lightDriver++
+        lightDriver ->> lightDriver : calculateFFT()
+        lightDriver--
+
+    else Exception 3.3: Rewind
+        User ->> btn : Press "Rewind"
+        btn++
+        btn -->> client : REWIND
+        btn--
+        alt Current song has played < 2 sec
+            client ->> soundDriver : sound_start(sound)
+            soundDriver++
+            soundDriver--
+
+            client ->> lightDriver : setLines(bandPercentages)
+            lightDriver++
+            lightDriver--
+
+            client -> server : getPreviousSong()
+            server++
+            server -->> client : 
+            server--
+            client ->> lightDriver : getAudioFromPath(currentPath)
+            lightDriver++
+            lightDriver ->> lightDriver : calculateFFT()
+            lightDriver--
+
+        else Current song has played >= 2 sec
+            client ->> soundDriver : sound_start(sound)
+            soundDriver++
+            soundDriver--
+            client ->> lightDriver : setLines(bandPercentages)
+            lightDriver++
+            lightDriver--
+        end
+    end
+
+
+@enduml

@@ -1,0 +1,25 @@
+@startuml PRJ3_SD_UC2
+
+mainframe **sd** UC2 Edit playlist
+
+actor Admin as admin
+participant "Server RPi" as Server
+
+admin ->> Server : Open music folder on server
+activate Server
+
+alt Playlist is not empty
+    alt Admin adds a song
+        admin ->> Server : Add song
+    else Admin removes a song
+        admin ->> Server : Remove song
+    end
+    admin ->> Server : Change order in playlist
+else Playlist is empty
+    note over of Server : Admin can't remove or modify playlist
+end 
+deactivate Server
+
+hide footbox
+
+@enduml

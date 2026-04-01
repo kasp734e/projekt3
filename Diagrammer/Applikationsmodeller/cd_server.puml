@@ -1,0 +1,31 @@
+@startuml cd_server
+
+hide circle
+skinparam classAttributeIconSize 0
+
+mainframe **cd** Server
+
+class "<<controller>> \n RPI Server" as server{
+    + Server()
+    
+    + getCurrentSong(): void
+    + getNextSong(): void
+    + getPreviousSong(): void
+    + shufflePlaylist(): void
+}
+
+class "<<boundary>> \n RPI_Client" as client {
+    + RPI_Client()
+
+}
+
+class "<<boundary>> \n PC_Client" as client2 {
+    + PC_Client()
+
+    + send_message(msg: string): void
+}
+
+server "1" <-- "1" client
+server "1" --> "1" client2
+
+@enduml

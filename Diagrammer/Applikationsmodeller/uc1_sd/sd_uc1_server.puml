@@ -1,0 +1,37 @@
+@startuml sd_uc1_server
+
+hide footbox
+mainframe **sd** UC1 Power On, server
+
+actor Admin
+participant "<<boundary>> \n :RPI Client" as client
+participant "<<controller>> \n :RPI Server" as server
+
+Admin ->> server : power on
+
+alt Server connected
+    client -> server : GET "/get_current_song"
+    server++
+    client++
+    server ->> server : getCurrentSong()
+    server -->> client : resp
+    server--
+
+    client -> server : GET "/get_next_song/:id"
+    server++
+    server ->> server : getNextSong()
+    server -->> client : resp
+    server--
+
+    client -> server : GET "/get_previous_song/:id"
+    server++
+    server ->> server : getPreviousSong()
+    server -->> client : resp
+    server--
+    client--
+
+else Exception 1.1: No connection to server
+    note over of client : CURL timeout. \n No calls can be made
+end
+
+@enduml

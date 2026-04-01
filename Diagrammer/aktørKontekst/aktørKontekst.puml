@@ -1,0 +1,15 @@
+@startuml aktørKontekst
+
+mainframe Aktør-Kontekst Diagram
+
+left to right direction
+
+actor Bruger as b
+actor Admin as a
+
+rectangle "\nLyd-/lyssystem\n" as s
+
+b --> s
+a --> s
+
+@enduml

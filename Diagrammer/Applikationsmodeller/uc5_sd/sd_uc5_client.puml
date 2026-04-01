@@ -1,0 +1,34 @@
+@startuml sd_uc5_client
+hide footbox
+mainframe **sd** UC5 Shuffle, client
+
+actor User
+participant "<<boundary>> \n :ButtonWorker" as btn
+participant "<<boundary>> \n :UI_led" as led
+participant "<<controller>> \n :RPI Client" as client
+participant "<<boundary>> \n :ServerComs" as server
+
+User ->> btn : Press "Shuffle"
+btn++
+client++
+btn <- client : readMusicButtons()
+btn -->> client : SHUFFLE
+btn--
+client -> server : shuffle()
+server++
+server -->> client :
+server--
+client -> server : getNextSong()
+server++
+client <<-- server : song
+server--
+client -> server : getPreviousSong()
+server++
+client <<-- server : song
+server--
+led <<- client : toggleLED2()
+client--
+led++
+led--
+
+@enduml

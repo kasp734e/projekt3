@@ -1,0 +1,57 @@
+@startuml sd_uc3_server
+hide footbox
+mainframe **sd** UC3 Control Audio, server
+
+participant "<<boundary>> \n :RPI Client" as client
+participant "<<controller>> \n :RPI Server" as server
+participant "<<boundary>> \n :PC Client" as client2
+
+opt Play/pause pressed, but no song in queue
+    client -> server : POST "/error/:error"
+    client++
+    server++
+    server ->> client2 : send_message(msg)
+    client2++
+    client2 -[#white]-> server: 
+    client2--
+    server -->> client : ok
+    server--
+    client--
+end
+
+note over of client : Song ends
+client -> server : GET "/get_next_song/:id"
+server++
+client++
+server -> server : getNextSong()
+server -->> client : resp
+server--
+client--
+
+opt User presses button
+    alt Exception 3.3: Rewind 
+        client -> server : GET "/get_next_song/:id"
+        server++
+        client++
+        server -> server : getNextSong()
+        server -->> client : resp
+        server--
+        client--
+
+    else Exception 3.4: Skip 
+        alt Current song has played < 2 sec
+            client -> server : GET "/get_previous_song/:id"
+            server++
+            client++
+            server -> server : getPreviousSong()
+            server -->> client : resp
+            server--
+            client--
+        else Current song has played >= 2 sec
+            note over of server : Server does nothing
+        end
+    end
+end
+
+
+@enduml

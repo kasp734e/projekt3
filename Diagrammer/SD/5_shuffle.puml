@@ -1,0 +1,45 @@
+@startuml PRJ3_SD_UC5
+
+mainframe **sd** UC5 Shuffle
+
+actor User
+participant "Button Input" as GPIO
+participant ":UI LED2" as UILED
+participant "Client1 RPi" as Client
+participant "Server RPi" as Server
+
+User ->> GPIO : Press "Shuffle"
+GPIO++
+GPIO ->> Client : "Shuffle" pressed
+GPIO--
+Client++
+alt Shuffle has not been pressed before
+    Client ->> Server : Shuffle playlist
+    Server++
+    Server--
+    Client ->> UILED : Turn on
+    UILED++
+    UILED--
+    Client ->> Client : Delete previous and next song
+    Client -> Server : Get shuffled previous and next song
+    Server++
+    Server -->> Client : Shuffled previous and next song
+    Server--
+    Client ->> Client : Perform DSP on fetched audios
+else Shuffle has been pressed before
+    Client ->> Server : Unshuffle playlist
+    Server++
+    Server--
+    Client ->> UILED : Turn off
+    UILED++
+    UILED--
+    Client ->> Client : Delete previous and next song
+    Client -> Server : Get unshuffled previous and next song
+    Server++
+    Server -->> Client : Unshuffled previous and next song
+    Server--
+    Client ->> Client : Perform DSP on fetched audios
+end
+
+hide footbox
+@enduml

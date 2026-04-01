@@ -1,0 +1,11 @@
+[submodule "client/include/pybind11"]
+	path = client/include/pybind11
+	url = https://github.com/pybind/pybind11
+
+[submodule "client/include/AudioFile"]
+	path = client/include/AudioFile
+	url = https://github.com/adamstark/AudioFile
+
+[submodule "client/include/miniaudio"]
+	path = client/include/miniaudio
+	url = https://github.com/mackron/miniaudio

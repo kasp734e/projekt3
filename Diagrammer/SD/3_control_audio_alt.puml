@@ -1,0 +1,81 @@
+@startuml PRJ3_SD_UC3_alt
+
+mainframe **sd** UC3 EXCEPT Button pressed
+
+actor User
+participant ":UI buttons" as GPIO
+participant ":Client1 RPi" as Client
+participant ":Server RPi" as Server
+participant ":Sound Control" as s_control
+participant ":Speaker" as Speaker
+participant ":LED Matrix" as LED
+
+opt User presses button
+    alt Exception 3.3: Rewind pressed
+        User ->> GPIO : Press "Rewind"
+        activate GPIO
+        GPIO ->> Client : Rewind
+        deactivate GPIO
+        Client++
+        alt Current song has played for less than 2 sonds
+            Client -> s_control : Play previous song
+            activate s_control
+            s_control ->> Speaker : Play previous song
+            activate Speaker
+            deactivate Speaker
+            s_control -->> Client : Ok
+            deactivate s_control
+        else Current song has played for 2 seconds or more
+            Client -> s_control : Restart current song
+            activate s_control
+            s_control ->> Speaker : Restart current song
+            activate Speaker
+            deactivate Speaker
+            s_control -->> Client : Ok
+            deactivate s_control
+        end
+        Client -> LED : Update visualization
+        activate LED
+        LED -->> Client : Ok
+        deactivate LED
+
+        Client -> Server : Request earlier previous song
+        activate Server
+        Server -->> Client : Send earlier previous song
+        deactivate Server
+        Client ->> Client : Perform DSP on earlier previous audio
+        Client ->> Client : Update song order on client
+        Client -[#white]-> Server :
+        Client--
+
+    else Exception 3.4: Skip pressed
+        User ->> GPIO : Press "Skip"
+        activate GPIO
+        GPIO ->> Client : Skip
+        deactivate GPIO
+        Client++
+
+        Client -> s_control : Play next song
+        activate s_control
+        s_control ->> Speaker : Play next song
+        activate Speaker
+        deactivate Speaker
+        s_control -->> Client : Ok
+        deactivate s_control
+
+        Client -> LED : Update visualization
+        activate LED
+        LED -->> Client : Ok
+        deactivate LED
+
+        Client -> Server : Get next song
+        activate Server
+        Server -->> Client : Send next song
+        deactivate Server
+        Client ->> Client : Perform DSP on new audio
+        Client ->> Client : Update song order on client
+    end
+end
+
+hide footbox
+@enduml

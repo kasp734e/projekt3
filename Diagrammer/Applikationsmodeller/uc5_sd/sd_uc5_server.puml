@@ -1,0 +1,32 @@
+@startuml sd_uc5_server
+hide footbox
+mainframe **sd** UC5 Shuffle, server
+
+participant "<<boundary>> \n :RPI Client" as client
+participant "<<controller>> \n :RPI Server" as server
+
+client -> server : POST "/shuffle_playlist"
+client++
+server++
+server ->> server : shufflePlaylist()
+server -->> client : ok
+server--
+client--
+
+client -> server : GET "/get_next_song/:id"
+server++
+client++
+server ->> server : getNextSong()
+server -->> client : resp
+server--
+client--
+
+client -> server : GET "/get_previous_song/:id"
+server++
+client++
+server -> server : getPreviousSong()
+server -->> client : resp
+server--
+client--
+
+@enduml

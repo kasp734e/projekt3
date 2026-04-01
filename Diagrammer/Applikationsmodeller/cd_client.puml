@@ -1,0 +1,68 @@
+@startuml cd_rpi_client
+
+hide circle
+skinparam classAttributeIconSize 0
+
+mainframe **cd** RPI Client
+
+class "<<controller>> \n RPI_Client" as client{
+    + RPI_Client()
+    
+    'from the sd's
+}
+
+class "<<boundary>> \n ServerComs" as server{
+    + ServerComs()
+
+    'from the sd's
+    + getNextSong(song_override: path): bool
+    + getCurrentSong(song_override: path): bool
+    + getPreviousSong(song_override: path): bool
+    + print(error_msg: string): void
+    + shufflePlaylist(): bool
+}
+class "<<boundary>> \n LightWorker" as lightDriver {
+    + LightWorker()
+
+    'from the sd's
+    + setLines(bandPercentages: array<int>): void
+    + calculateFFT(): vector<pair<double, double>> 
+    + getAudioFromPath(currentPath): \n   audioFileObject 
+}
+class "<<boundary>> \n AudioWorker" as soundDriver {
+    + AudioWorker()
+
+    'from the sd's
+    + sound_start(sound): void
+    + resume(): void
+    + pause(): void
+    + set_volume(volume: float): void
+}
+
+class "<<boundary>> \n UI_led" as led {
+    + UI_led()
+
+    'from the sd's
+    'LED
+    + led1_blink(): void
+    + led1_on(): void
+    + led1_off(): void
+    + ToggleLED2(): void
+}
+
+class "<<boundary>> \n ButtonWorker" as btn {
+    + ButtonWorker()
+
+    'from the sd's
+    'btn
+    + readMusicButtons(): void
+}
+
+client "1" --> "1" server
+client "1" --> "1" lightDriver
+client "1" --> "1" soundDriver
+client "1" --> "1" led
+client "1" --> "1" btn
+' client "1" *-- "1" console
+
+@enduml

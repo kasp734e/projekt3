@@ -1,0 +1,61 @@
+<!-- the pc client needs to add event listener to socket -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>PRJ3, group 3, PC Client for error messages</title>
+
+    <!-- Axios for HTTP -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Modern Tabulator -->
+    <script src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
+    <link href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css" rel="stylesheet">
+
+    <script>
+        let table;
+        let errorMessages = []; // store error messages
+        
+        //WebSocket Routing (Note: Route Is chat)
+        const socket = new WebSocket('ws://192.168.50.100:8080/chat');
+        //Listen for messages
+        socket.addEventListener('message', function (message) {
+            console.log(message.data);
+
+            errorMessages.push({
+                timestamp: new Date().toLocaleTimeString    (),
+                error: message.data
+            });
+            updateTable();
+        });
+
+        function updateTable() {
+            if (!table) {
+                table = new Tabulator("#table", {
+                    layout: "fitDataFill",
+                    height: "311px",
+                    columns: [
+                        { title: "Time:", field: "timestamp" },
+                        {title: "Error Message", field: "error"}
+                    ]
+                });
+            }
+
+            table.setData(errorMessages);
+        }
+
+        window.addEventListener('load', function() {
+        updateTable();
+        });
+
+    </script>
+</head>
+
+<body> 
+    <h1>PRJ3, group 3, PC Client for error messages</h1>
+    <div id="table"></div>
+</body>
+
+</html>
